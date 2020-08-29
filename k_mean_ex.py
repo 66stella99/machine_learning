@@ -4,8 +4,18 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
+def get_vector_min_error(data: np.array, mean_values: np.array):
+    magnitudes = []
+    for mean_val in mean_values:
+        diff_vector = mean_val - data
+        magnitudes.append(np.sqrt(np.mean(np.square(diff_vector))))
+    min_error = np.min(magnitudes)
+    return min_error
+
+
 def get_clusters(data_set: np.array, mean_values: np.array):
     clusters = {}
+    err = {}
     k = len(mean_values)
     for i in range(k):
         clusters[i] = []
@@ -15,17 +25,22 @@ def get_clusters(data_set: np.array, mean_values: np.array):
         for mean_val in mean_values:
             diff_vector = mean_val - data
             magnitudes.append(np.sqrt(np.mean(np.square(diff_vector))))
-        i = magnitudes.index(np.min(magnitudes))
+        min_magnitude = np.min(magnitudes)
+        i = magnitudes.index(min_magnitude)
         clusters[i].append(data)
 
     for key in clusters:
         clusters[key] = np.array(clusters[key])
-
     return clusters
 
 
 def calc_means(clusters):
     return [np.mean(samples, 0) for samples in clusters.values()]
+
+
+def calc_error(clusters):
+    pass
+    return
 
 
 def check_convergence(old_means, new_means, epsilon):
@@ -44,8 +59,7 @@ def plot_clusters(clusters):
     plt.show(block=False)
 
 
-def main():
-    csv_data = pd.read_csv("datasets_17860_23404_IRIS.csv")
+def k_mean(csv_data):
     data_set = csv_data.to_numpy()[:, :-3]
     k = 3
     mean_values = []
@@ -56,12 +70,22 @@ def main():
     converged = False
     while not converged:
         clusters = get_clusters(data_set, mean_values)
-        # for key, values in clusters.items():
-        #     print(f"{key} = {values}\n")
         new_mean_values = calc_means(clusters)
         converged = check_convergence(mean_values, new_mean_values, 1e-6)
         mean_values = new_mean_values
-        plot_clusters(clusters)
+
+    print(clusters[i])
+    err[tuple(data)] = np.mean(np.sqrt(np.mean(np.square(min_magnitude - data))))
+    #print(err)
+
+    plot_clusters(clusters)
     plt.show()
+
+
+def main():
+    csv_data = pd.read_csv("datasets_17860_23404_IRIS.csv")
+    for i in range(1):
+        k_mean(csv_data)
+
 
 main()
