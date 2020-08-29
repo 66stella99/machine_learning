@@ -4,13 +4,25 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def get_vector_min_error(data: np.array, mean_values: np.array):
+def get_sample_min_error(sample: np.array, mean_values: np.array):
     magnitudes = []
     for mean_val in mean_values:
-        diff_vector = mean_val - data
+        diff_vector = mean_val - sample
         magnitudes.append(np.sqrt(np.mean(np.square(diff_vector))))
     min_error = np.min(magnitudes)
-    return min_error
+    min_error_index = magnitudes.index(min_error)
+    return min_error_index, min_error
+
+
+def get_data_set_errors(data_set: np.array, mean_values: np.array):
+    errors = {key: [] for key in range(len(mean_values))}
+    for sample in data_set:
+        min_error_index, min_error = get_sample_min_error(sample, mean_values)
+        errors[min_error_index].append(min_error)
+    mean_errors = []
+    for key in errors:
+        mean_errors.append(np.mean(errors[key]))
+    return mean_errors
 
 
 def get_clusters(data_set: np.array, mean_values: np.array):
@@ -21,13 +33,8 @@ def get_clusters(data_set: np.array, mean_values: np.array):
         clusters[i] = []
 
     for data in data_set:
-        magnitudes = []
-        for mean_val in mean_values:
-            diff_vector = mean_val - data
-            magnitudes.append(np.sqrt(np.mean(np.square(diff_vector))))
-        min_magnitude = np.min(magnitudes)
-        i = magnitudes.index(min_magnitude)
-        clusters[i].append(data)
+        index, _ = get_sample_min_error(data, mean_values)
+        clusters[index].append(data)
 
     for key in clusters:
         clusters[key] = np.array(clusters[key])
@@ -68,15 +75,14 @@ def k_mean(csv_data):
         mean_values.append(sample)
 
     converged = False
+    clusters = []
     while not converged:
         clusters = get_clusters(data_set, mean_values)
         new_mean_values = calc_means(clusters)
         converged = check_convergence(mean_values, new_mean_values, 1e-6)
         mean_values = new_mean_values
 
-    print(clusters[i])
-    err[tuple(data)] = np.mean(np.sqrt(np.mean(np.square(min_magnitude - data))))
-    #print(err)
+    print(get_data_set_errors(data_set, mean_values))
 
     plot_clusters(clusters)
     plt.show()
