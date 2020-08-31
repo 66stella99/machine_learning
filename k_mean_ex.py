@@ -22,7 +22,7 @@ def get_data_set_errors(data_set: np.array, mean_values: np.array):
     mean_errors = []
     for key in errors:
         mean_errors.append(np.mean(errors[key]))
-    return mean_errors
+    return np.linalg.norm(mean_errors)
 
 
 def get_clusters(data_set: np.array, mean_values: np.array):
@@ -63,32 +63,51 @@ def plot_clusters(clusters):
     ax.set(xlabel='data variable 1', ylabel='data variable 2',
            title='')
     ax.grid()
-    plt.show(block=False)
+    #plt.show(block=False)
 
+def plot_convergence(row_convergence):
+    convergence=[]
+    fig, ax = plt.subplots()
+    #print(row_convergence)
+    ax.plot(range(len(row_convergence)), row_convergence , '')
+    ax.set(xlabel='range', ylabel='convergence')
+    ax.grid()
+    plt.show()
 
 def k_mean(csv_data):
     data_set = csv_data.to_numpy()[:, :-3]
     k = 3
     mean_values = []
-    for i in range(k):
-        sample = csv_data.sample().to_numpy()[0][:-3]
-        mean_values.append(sample)
+    sample_distance = np.ndarray([])
+    sample_distance = [0,0,0]
 
+    while(sample_distance[0]<0.1 or sample_distance[1]<0.1 or sample_distance[2]<0.1):
+        for i in range(k):
+            sample = csv_data.sample().to_numpy()[0][:-3]
+            mean_values.append(sample)
+
+        sample_distance[0] = np.linalg.norm(mean_values[1]-mean_values[0])
+        sample_distance[1] = np.linalg.norm(mean_values[2]-mean_values[0])
+        sample_distance[2] = np.linalg.norm(mean_values[2]-mean_values[1])
     converged = False
     clusters = []
+    converged_diff= []
     while not converged:
         clusters = get_clusters(data_set, mean_values)
         new_mean_values = calc_means(clusters)
         converged = check_convergence(mean_values, new_mean_values, 1e-6)
+        converged_diff.append(np.sqrt(np.mean(np.square(np.array(new_mean_values)-np.array(mean_values)))))
         mean_values = new_mean_values
-
-    print(get_data_set_errors(data_set, mean_values))
+        #abs_error = get_data_set_errors(data_set, mean_values)
 
     plot_clusters(clusters)
-    plt.show()
+    plot_convergence(converged_diff)
+    #plt.show()
 
 
 def main():
+    mean_values=[]
+    error_values=[]
     csv_data = pd.read_csv("datasets_17860_23404_IRIS.csv")
     for i in range(1):
         k_mean(csv_data)
