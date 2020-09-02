@@ -106,8 +106,6 @@ def k_mean(csv_data):
 
 
 def main():
-    mean_values=[]
-    error_values=[]
     csv_data = pd.read_csv("datasets_17860_23404_IRIS.csv")
     for i in range(1):
         k_mean(csv_data)
