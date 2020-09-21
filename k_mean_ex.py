@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+
 import pandas as pd
 
 
@@ -27,7 +28,6 @@ def get_data_set_errors(data_set: np.array, mean_values: np.array):
 
 def get_clusters(data_set: np.array, mean_values: np.array):
     clusters = {}
-    err = {}
     k = len(mean_values)
     for i in range(k):
         clusters[i] = []
@@ -66,9 +66,7 @@ def plot_clusters(clusters):
     #plt.show(block=False)
 
 def plot_convergence(row_convergence):
-    convergence=[]
     fig, ax = plt.subplots()
-    #print(row_convergence)
     ax.plot(range(len(row_convergence)), row_convergence , '')
     ax.set(xlabel='range', ylabel='convergence')
     ax.grid()
