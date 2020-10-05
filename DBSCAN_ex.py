@@ -160,7 +160,6 @@ def plot_clusters(data_clusters):
         plt.scatter(data_x, data_y, color=color)
 
 
-
 def dbscan(data, radius, edge_density):
     dist_matrix = calc_distance(data)
     #np.savetxt('dist_matrix.txt', dist_matrix)
@@ -183,7 +182,7 @@ def main():
     radius = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
     edge_density = [1,2,3,4,5,6,7,8,9,10]
     final_clusters = []
-    final_clusters = dbscan(data, 0.3,3)
+    final_clusters = dbscan(data, 0.3, 3)
     '''
     for i in range(len(radius)):
         for j in range(len(edge_density)):
